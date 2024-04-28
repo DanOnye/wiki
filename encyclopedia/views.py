@@ -3,6 +3,8 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 
 from . import util
+from .forms import CreateEntryForm
+
 import markdown2
 
 
@@ -44,3 +46,28 @@ def entry(request, title):
 def search(request):
     return HttpResponse("Search Page")
 
+def create(request):
+    if request.method == "POST":
+        # Validate form first 
+        form = CreateEntryForm(request.POST)
+        if form.is_valid():
+            form_title = form.cleaned_data['title']
+            form_content = form.cleaned_data['content']
+            entries = util.list_entries()
+            # Check if entry title already exists
+            for entry in entries:
+                if form_title == entry:
+                    error = "Error: Title Already Exists. Try Another."
+                    return render(request, "encyclopedia/create.html", {
+                        "form": form,
+                        "error": error
+                    })
+            # Save new entry to disk and go to page
+            util.save_entry(form_title, form_content)
+            return HttpResponseRedirect(reverse("entry", args=[form_title]))
+    else:
+        form = CreateEntryForm()
+
+    return render(request, "encyclopedia/create.html", {
+        "form": form
+    })

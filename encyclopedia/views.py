@@ -25,10 +25,12 @@ def index(request):
         found = True if matches else False
         return render(request, "encyclopedia/search.html", {
             "entries": matches,
-            "found": found
+            "found": found,
+            "all_entries": util.list_entries()
         })
     return render(request, "encyclopedia/index.html", {
-        "entries": entries
+        "entries": entries,
+        "all_entries": util.list_entries()
     })
 
 def entry(request, title):
@@ -39,7 +41,8 @@ def entry(request, title):
     entry_html = markdown2.markdown(entry_file)
     return render(request, "encyclopedia/entry.html",{
         "title": title,
-        "entry": entry_html
+        "entry": entry_html,
+        "all_entries": util.list_entries()
     })
 
 def search(request):
@@ -59,7 +62,8 @@ def create(request):
                     error = "Error: Title Already Exists. Try Another."
                     return render(request, "encyclopedia/create.html", {
                         "form": form,
-                        "error": error
+                        "error": error,
+                        "all_entries": util.list_entries()
                     })
             # Save new entry to disk and go to page
             util.save_entry(form_title, form_content)
@@ -68,7 +72,8 @@ def create(request):
         form = CreateEntryForm()
 
     return render(request, "encyclopedia/create.html", {
-        "form": form
+        "form": form,
+        "all_entries": util.list_entries()
     })
 
 def edit(request, title):
@@ -82,5 +87,6 @@ def edit(request, title):
         
     return render(request, "encyclopedia/edit.html", {
         "form": form,
-        "title": title
+        "title": title,
+        "all_entries": util.list_entries()
     })

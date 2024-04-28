@@ -3,8 +3,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.urls import reverse
 
 from . import util
-from .forms import CreateEntryForm
-
+from .forms import CreateEntryForm, EditEntryForm
 import markdown2
 
 
@@ -70,4 +69,18 @@ def create(request):
 
     return render(request, "encyclopedia/create.html", {
         "form": form
+    })
+
+def edit(request, title):
+    form = EditEntryForm({'content': util.get_entry(title)})
+    if request.method == "POST":
+        form = EditEntryForm(request.POST)
+        if form.is_valid:
+            form_content = request.POST['content']
+            util.save_entry(title, form_content)
+            return HttpResponseRedirect(reverse("entry", args=[title]))
+        
+    return render(request, "encyclopedia/edit.html", {
+        "form": form,
+        "title": title
     })

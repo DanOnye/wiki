@@ -4,4 +4,5 @@
 
 {% block body %}
     {{entry|safe}}
+    <a href="{% url 'edit' title %}">Edit Entry</a>
 {% endblock body %}
